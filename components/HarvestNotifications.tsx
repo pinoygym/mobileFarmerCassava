@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Bell, Calendar, AlertTriangle } from 'lucide-react-native';
+import { Bell, Calendar, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { useFarmers } from '@/hooks/useFarmers';
 import { getDaysUntilHarvest, formatDate } from '@/utils/dateHelpers';
 
