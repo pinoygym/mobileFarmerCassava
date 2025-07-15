@@ -75,6 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       
+      console.log('Attempting login for:', username);
+      
       // First, get the user by username
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -82,17 +84,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('username', username)
         .limit(1);
 
+      console.log('User query result:', userData, userError);
+
       if (userError || !userData || userData.length === 0) {
+        console.log('User not found or error:', userError);
         throw new Error('Invalid credentials');
       }
 
       const user = userData[0];
+      console.log('Found user:', { id: user.id, username: user.username, role: user.role });
 
       // Simple password verification (in production, use proper bcrypt)
       const hashedInput = await hashPassword(password);
+      console.log('Password hash comparison:', { input: hashedInput, stored: user.password_hash });
+      
       if (hashedInput !== user.password_hash) {
+        console.log('Password mismatch');
         throw new Error('Invalid credentials');
       }
+
+      console.log('Password verified, proceeding with auth');
 
       // Create or sign in with Supabase Auth
       const email = `${user.id}@farmer-app.local`;
@@ -103,6 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (authResult.error) {
+        console.log('Auth sign in failed, trying sign up:', authResult.error);
         // If user doesn't exist in auth, create them
         const { error: signUpError } = await supabase.auth.signUp({
           email,
@@ -110,6 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
 
         if (signUpError) throw signUpError;
+        console.log('Sign up successful, trying sign in again');
 
         // Try signing in again
         authResult = await supabase.auth.signInWithPassword({
@@ -120,10 +133,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (authResult.error) throw authResult.error;
       }
 
+      console.log('Login successful');
       // Store credentials securely
       await SecureStore.setItemAsync('username', username);
       
     } catch (error) {
+      console.error('Login error:', error);
       setIsLoading(false);
       throw new Error('Invalid credentials');
     }
