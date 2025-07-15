@@ -5,6 +5,8 @@ import { useRouter } from 'expo-router';
 import { DashboardCard } from '@/components/DashboardCard';
 import { KPICard } from '@/components/KPICard';
 import { RecentActivity } from '@/components/RecentActivity';
+import { HarvestNotifications } from '@/components/HarvestNotifications';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/hooks/useAuth';
 import { useFarmers } from '@/hooks/useFarmers';
 import { Users, Sprout, Calendar, MapPin, TrendingUp, TriangleAlert as AlertTriangle, ChartBar as BarChart3 } from 'lucide-react-native';
@@ -60,78 +62,73 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        <View style={styles.header}>
-          <Text style={styles.title}>Dashboard</Text>
-          <Text style={styles.subtitle}>Welcome back, {user.username}!</Text>
-        </View>
-
-        <View style={styles.kpiContainer}>
-          <KPICard
-            title="Total Farmers"
-            value={totalFarmers.toString()}
-            icon={Users}
-            color="#22C55E"
-          />
-          <KPICard
-            title="Total Land Area"
-            value={`${totalHectares.toFixed(1)} ha`}
-            icon={MapPin}
-            color="#16A34A"
-          />
-          <KPICard
-            title="Avg Land Size"
-            value={`${avgLandSize.toFixed(1)} ha`}
-            icon={TrendingUp}
-            color="#EAB308"
-          />
-          <KPICard
-            title="Upcoming Harvests"
-            value={upcomingHarvests.toString()}
-            icon={Calendar}
-            color="#F59E0B"
-          />
-        </View>
-
-        <View style={styles.dashboardGrid}>
-          <DashboardCard
-            title="Manage Farmers"
-            description="Add, edit, and view farmer information"
-            icon={Users}
-            color="#22C55E"
-            onPress={() => router.push('/(tabs)/farmers')}
-          />
-          <DashboardCard
-            title="View Reports"
-            description="Generate and view detailed reports"
-            icon={BarChart3}
-            color="#16A34A"
-            onPress={() => router.push('/(tabs)/reports')}
-          />
-          <DashboardCard
-            title="Plant Calendar"
-            description="Track planting and harvest dates"
-            icon={Sprout}
-            color="#EAB308"
-            onPress={() => router.push('/(tabs)/farmers')}
-          />
-        </View>
-
-        {overdueHarvests > 0 && (
-          <View style={styles.alertContainer}>
-            <AlertTriangle size={20} color="#EF4444" />
-            <Text style={styles.alertText}>
-              {overdueHarvests} harvest(s) are overdue
-            </Text>
+      <ErrorBoundary>
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          <View style={styles.header}>
+            <Text style={styles.title}>Dashboard</Text>
+            <Text style={styles.subtitle}>Welcome back, {user.username}!</Text>
           </View>
-        )}
 
-        <RecentActivity farmers={farmers} />
-      </ScrollView>
+          <HarvestNotifications />
+
+          <View style={styles.kpiContainer}>
+            <KPICard
+              title="Total Farmers"
+              value={totalFarmers.toString()}
+              icon={Users}
+              color="#22C55E"
+            />
+            <KPICard
+              title="Total Land Area"
+              value={`${totalHectares.toFixed(1)} ha`}
+              icon={MapPin}
+              color="#16A34A"
+            />
+            <KPICard
+              title="Avg Land Size"
+              value={`${avgLandSize.toFixed(1)} ha`}
+              icon={TrendingUp}
+              color="#EAB308"
+            />
+            <KPICard
+              title="Upcoming Harvests"
+              value={upcomingHarvests.toString()}
+              icon={Calendar}
+              color="#F59E0B"
+            />
+          </View>
+
+          <View style={styles.dashboardGrid}>
+            <DashboardCard
+              title="Manage Farmers"
+              description="Add, edit, and view farmer information"
+              icon={Users}
+              color="#22C55E"
+              onPress={() => router.push('/(tabs)/farmers')}
+            />
+            <DashboardCard
+              title="View Reports"
+              description="Generate and view detailed reports"
+              icon={BarChart3}
+              color="#16A34A"
+              onPress={() => router.push('/(tabs)/reports')}
+            />
+            <DashboardCard
+              title="Plant Calendar"
+              description="Track planting and harvest dates"
+              icon={Sprout}
+              color="#EAB308"
+              onPress={() => router.push('/(tabs)/farmers')}
+            />
+          </View>
+
+          <RecentActivity farmers={farmers} />
+        </ScrollView>
+      </ErrorBoundary>
     </SafeAreaView>
   );
 }

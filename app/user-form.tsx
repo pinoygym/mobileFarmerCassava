@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
+import { validateUserData } from '@/utils/validation';
 import { ArrowLeft, Save, User, Lock, Shield } from 'lucide-react-native';
 
 export default function UserFormScreen() {
@@ -41,8 +42,9 @@ export default function UserFormScreen() {
   }, [isEditing, id, users]);
 
   const handleSave = async () => {
-    if (!formData.username || (!isEditing && !formData.password)) {
-      Alert.alert('Error', 'Please fill in all required fields');
+    const validation = validateUserData(formData, isEditing);
+    if (!validation.isValid) {
+      Alert.alert('Validation Error', validation.errors.join('\n'));
       return;
     }
 

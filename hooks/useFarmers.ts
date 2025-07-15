@@ -70,13 +70,13 @@ export function useFarmers() {
 
   const createFarmer = async (farmerData: Omit<Farmer, 'id' | 'created_at' | 'user_id'>) => {
     try {
-      if (!session?.user?.id) throw new Error('User not authenticated');
+      if (!user?.id) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
         .from('farmers')
         .insert([{
           ...farmerData,
-          user_id: session.user.id,
+          user_id: user.id,
         }])
         .select()
         .single();

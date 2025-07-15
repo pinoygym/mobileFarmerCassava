@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MapPin, Phone, Calendar, CreditCard as Edit, Trash2 } from 'lucide-react-native';
+import { getHarvestStatus, formatDate } from '@/utils/dateHelpers';
 
 interface Farmer {
   id: string;
@@ -23,25 +24,7 @@ interface FarmerCardProps {
 }
 
 export function FarmerCard({ farmer, onEdit, onDelete }: FarmerCardProps) {
-  const getHarvestStatus = () => {
-    if (!farmer.harvest_date) return null;
-    
-    const harvestDate = new Date(farmer.harvest_date);
-    const today = new Date();
-    const diffTime = harvestDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays < 0) {
-      return { text: 'Overdue', color: '#EF4444' };
-    } else if (diffDays <= 7) {
-      return { text: 'Due Soon', color: '#F59E0B' };
-    } else if (diffDays <= 30) {
-      return { text: 'Upcoming', color: '#EAB308' };
-    }
-    return null;
-  };
-
-  const harvestStatus = getHarvestStatus();
+  const harvestStatus = farmer.harvest_date ? getHarvestStatus(farmer.harvest_date) : null;
 
   return (
     <View style={styles.card}>
@@ -93,7 +76,7 @@ export function FarmerCard({ farmer, onEdit, onDelete }: FarmerCardProps) {
           <View style={styles.infoRow}>
             <Calendar size={16} color="#6b7280" />
             <Text style={styles.infoText}>
-              Harvest: {new Date(farmer.harvest_date).toLocaleDateString()}
+              Harvest: {formatDate(farmer.harvest_date)}
             </Text>
           </View>
         )}

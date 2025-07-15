@@ -1,7 +1,11 @@
 import { Tabs } from 'expo-router';
+import { useAuth } from '@/hooks/useAuth';
 import { Users, ChartBar as BarChart3, Chrome as Home, User, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
   return (
     <Tabs
       screenOptions={{
@@ -62,6 +66,7 @@ export default function TabLayout() {
         name="admin"
         options={{
           title: 'Admin',
+          href: isAdmin ? '/admin' : null,
           tabBarIcon: ({ size, color }) => (
             <Settings size={size} color={color} />
           ),

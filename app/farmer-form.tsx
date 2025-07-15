@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { useFarmers } from '@/hooks/useFarmers';
+import { validateFarmerData } from '@/utils/validation';
+import { formatDateInput } from '@/utils/dateHelpers';
 import { ArrowLeft, Save, User, MapPin, Calendar, Sprout } from 'lucide-react-native';
 
 export default function FarmerFormScreen() {
@@ -47,16 +49,17 @@ export default function FarmerFormScreen() {
           town: farmer.town,
           contact_number: farmer.contact_number,
           land_area: farmer.land_area?.toString() || '',
-          planted_date: farmer.planted_date || '',
-          harvest_date: farmer.harvest_date || '',
+          planted_date: formatDateInput(farmer.planted_date || ''),
+          harvest_date: formatDateInput(farmer.harvest_date || ''),
         });
       }
     }
   }, [isEditing, id, farmers]);
 
   const handleSave = async () => {
-    if (!formData.first_name || !formData.last_name || !formData.town || !formData.barangay) {
-      Alert.alert('Error', 'Please fill in all required fields');
+    const validation = validateFarmerData(formData);
+    if (!validation.isValid) {
+      Alert.alert('Validation Error', validation.errors.join('\n'));
       return;
     }
 
