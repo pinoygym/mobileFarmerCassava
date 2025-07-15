@@ -80,20 +80,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('users')
         .select('id, username, role, password_hash')
         .eq('username', username)
-        .single();
+        .limit(1);
 
-      if (userError || !userData) {
+      if (userError || !userData || userData.length === 0) {
         throw new Error('Invalid credentials');
       }
 
+      const user = userData[0];
+
       // Simple password verification (in production, use proper bcrypt)
       const hashedInput = await hashPassword(password);
-      if (hashedInput !== userData.password_hash) {
+      if (hashedInput !== user.password_hash) {
         throw new Error('Invalid credentials');
       }
 
       // Create or sign in with Supabase Auth
-      const email = `${userData.id}@farmer-app.local`;
+      const email = `${user.id}@farmer-app.local`;
       
       let authResult = await supabase.auth.signInWithPassword({
         email,
