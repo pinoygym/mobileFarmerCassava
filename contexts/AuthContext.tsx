@@ -15,6 +15,7 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
+  signup: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -156,6 +157,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signup = async (username: string, password: string) => {
+    try {
+      setIsLoading(true);
+      
+      console.log('Attempting signup for:', username);
+      
+      // Check if username already exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', username)
+        .limit(1);
+
+      if (checkError) {
+        console.error('Error checking existing user:', checkError);
+        throw new Error('Failed to check username availability');
+      }
+
+      if (existingUser && existingUser.length > 0) {
+        throw new Error('Username already exists');
+      }
+
+      // Hash password
+      const passwordHash = await hashPassword(password);
+
+      // Create user in database
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert([{
+          username,
+          password_hash: passwordHash,
+          role: 'user', // Default role for new signups
+        }])
+        .select('id, username, role')
+        .single();
+
+      if (createError) {
+        console.error('Error creating user:', createError);
+        throw new Error('Failed to create account');
+      }
+
+      console.log('User created successfully:', newUser);
+      
+    } catch (error) {
+      console.error('Signup error:', error);
+      setIsLoading(false);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       await supabase.auth.signOut();
@@ -169,7 +222,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, session, isLoading, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

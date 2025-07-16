@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { LogIn, User, Lock, Sprout } from 'lucide-react-native';
 
@@ -73,6 +74,13 @@ export default function LoginScreen() {
               {loading ? 'Signing in...' : 'Sign In'}
             </Text>
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Don't have an account? </Text>
+          <Link href="/signup" style={styles.footerLink}>
+            <Text style={styles.footerLinkText}>Sign Up</Text>
+          </Link>
         </View>
 
         <View style={styles.demoCredentials}>
@@ -175,5 +183,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
     marginBottom: 4,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 32,
+    marginBottom: 20,
+  },
+  footerText: {
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  footerLink: {
+    marginLeft: 4,
+  },
+  footerLinkText: {
+    fontSize: 16,
+    color: '#22C55E',
+    fontWeight: '600',
   },
 });

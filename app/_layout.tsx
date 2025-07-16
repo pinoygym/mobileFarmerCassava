@@ -11,6 +11,7 @@ export default function RootLayout() {
     <AuthProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="login" />
+        <Stack.Screen name="signup" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="farmer-form" />
         <Stack.Screen name="user-form" />
