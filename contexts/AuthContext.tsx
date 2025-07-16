@@ -76,6 +76,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       
       console.log('Attempting login for:', username);
+      console.log('Supabase URL:', process.env.EXPO_PUBLIC_SUPABASE_URL);
+      console.log('Supabase Key exists:', !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY);
       
       // First, get the user by username
       const { data: userData, error: userError } = await supabase
@@ -85,9 +87,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .limit(1);
 
       console.log('User query result:', userData, userError);
+      console.log('Query executed successfully, data length:', userData?.length || 0);
 
       if (userError || !userData || userData.length === 0) {
         console.log('User not found or error:', userError);
+        console.log('Available users check...');
+        
+        // Debug: Check if any users exist at all
+        const { data: allUsers, error: allUsersError } = await supabase
+          .from('users')
+          .select('username')
+          .limit(5);
+        
+        console.log('All users in database:', allUsers, allUsersError);
         throw new Error('Invalid credentials');
       }
 
